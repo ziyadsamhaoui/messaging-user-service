@@ -18,6 +18,9 @@ target/
 *.iws
 *.iml
 *.ipr
+*.junie
+/docs/
+/adr/
 
 ### NetBeans ###
 /nbproject/private/
@@ -31,3 +34,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Temporary files ###
+/src/main/resources/db/migration
+/src/test
+src/main/java/com/ziyadsamhaoui/messaginguserservice
+

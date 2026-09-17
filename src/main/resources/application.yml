@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: messaging-user-service
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME:user_db}
+    username: ${DB_USER:user_service}
+    password: ${DB_PASSWORD:user_service_pw}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        default_schema: public
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+server:
+  port: 8082
+
+badrlink:
+  security:
+    jwt:
+      issuer-uri: ${JWT_ISSUER_URI:http://localhost:8081/realms/badrlink}
+      jwk-set-uri: ${JWT_JWK_SET_URI:http://localhost:8081/oauth2/jwks}
+    internal:
+      hmac-secret: ${INTERNAL_HMAC_SECRET:dev-internal-secret-change-me}
+    auth-service:
+      base-url: ${AUTH_SERVICE_URL:http://localhost:8081}

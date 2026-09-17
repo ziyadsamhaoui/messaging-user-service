@@ -36,7 +36,7 @@ build/
 .vscode/
 
 ### Temporary files ###
-/src/main/resources/db/migration
 /src/test
 src/main/java/com/ziyadsamhaoui/messaginguserservice
+compose.yaml
 

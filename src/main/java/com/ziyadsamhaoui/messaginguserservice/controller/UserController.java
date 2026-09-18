@@ -1,9 +1,9 @@
 package com.ziyadsamhaoui.messaginguserservice.controller;
 
 import com.ziyadsamhaoui.messaginguserservice.security.CurrentUser;
-import com.ziyadsamhaoui.messaginguserservice.DTO.UserDtos.PublicUserDto;
-import com.ziyadsamhaoui.messaginguserservice.DTO.UserDtos.UpdateRoleRequest;
-import com.ziyadsamhaoui.messaginguserservice.DTO.UserDtos.UpdateUserRequest;
+import com.ziyadsamhaoui.messaginguserservice.dto.UserDtos.PublicUserDto;
+import com.ziyadsamhaoui.messaginguserservice.dto.UserDtos.UpdateRoleRequest;
+import com.ziyadsamhaoui.messaginguserservice.dto.UserDtos.UpdateUserRequest;
 import com.ziyadsamhaoui.messaginguserservice.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

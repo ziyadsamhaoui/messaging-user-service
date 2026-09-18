@@ -1,4 +1,4 @@
-package com.ziyadsamhaoui.messaginguserservice.DTO;
+package com.ziyadsamhaoui.messaginguserservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ziyadsamhaoui.messaginguserservice.enums.UserType;

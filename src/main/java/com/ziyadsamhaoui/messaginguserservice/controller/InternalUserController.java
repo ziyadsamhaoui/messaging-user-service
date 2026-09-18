@@ -1,8 +1,8 @@
 package com.ziyadsamhaoui.messaginguserservice.controller;
 
-import com.ziyadsamhaoui.messaginguserservice.DTO.UserDtos.CreateUserRequest;
-import com.ziyadsamhaoui.messaginguserservice.DTO.UserDtos.LastSeenRequest;
-import com.ziyadsamhaoui.messaginguserservice.DTO.UserDtos.PublicUserDto;
+import com.ziyadsamhaoui.messaginguserservice.dto.UserDtos.CreateUserRequest;
+import com.ziyadsamhaoui.messaginguserservice.dto.UserDtos.LastSeenRequest;
+import com.ziyadsamhaoui.messaginguserservice.dto.UserDtos.PublicUserDto;
 import com.ziyadsamhaoui.messaginguserservice.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

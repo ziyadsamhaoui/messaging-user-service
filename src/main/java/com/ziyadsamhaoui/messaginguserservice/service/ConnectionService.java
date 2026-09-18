@@ -1,6 +1,6 @@
 package com.ziyadsamhaoui.messaginguserservice.service;
 
-import com.ziyadsamhaoui.messaginguserservice.DTO.ConnectionDto;
+import com.ziyadsamhaoui.messaginguserservice.dto.ConnectionDto;
 import com.ziyadsamhaoui.messaginguserservice.model.Connection;
 import com.ziyadsamhaoui.messaginguserservice.enums.ConnectionStatus;
 import com.ziyadsamhaoui.messaginguserservice.exception.*;

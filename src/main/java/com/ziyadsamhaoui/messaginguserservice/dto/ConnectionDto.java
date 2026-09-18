@@ -1,4 +1,4 @@
-package com.ziyadsamhaoui.messaginguserservice.DTO;
+package com.ziyadsamhaoui.messaginguserservice.dto;
 
 import com.ziyadsamhaoui.messaginguserservice.enums.ConnectionStatus;
 

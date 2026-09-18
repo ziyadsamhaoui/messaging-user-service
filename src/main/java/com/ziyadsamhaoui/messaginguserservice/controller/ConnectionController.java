@@ -1,6 +1,6 @@
 package com.ziyadsamhaoui.messaginguserservice.controller;
 
-import com.ziyadsamhaoui.messaginguserservice.DTO.ConnectionDto;
+import com.ziyadsamhaoui.messaginguserservice.dto.ConnectionDto;
 import com.ziyadsamhaoui.messaginguserservice.service.ConnectionService;
 import com.ziyadsamhaoui.messaginguserservice.security.CurrentUser;
 import lombok.RequiredArgsConstructor;

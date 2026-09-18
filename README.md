@@ -122,6 +122,18 @@ User credentials such as passwords, emails, and tokens are intentionally kept ou
 * Docker
 * Maven (or the included Maven Wrapper)
 
+### Environment Configuration
+
+Copy the example environment file and configure the required variables:
+
+  ```bash
+  cp .env.example .env
+  ```
+
+Then update `.env` with your local configuration if needed.
+
+> **Note:** `.env` contains environment-specific values and should not be committed. Use `.env.example` as the template for required variables.
+
 ### Start the database
 
 ```bash

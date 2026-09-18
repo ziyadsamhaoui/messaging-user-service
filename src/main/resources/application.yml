@@ -4,7 +4,7 @@ spring:
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME:user_db}
     username: ${DB_USER:user_service}
-    password: ${DB_PASSWORD:user_service_pw}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -25,6 +25,6 @@ badrlink:
       issuer-uri: ${JWT_ISSUER_URI:http://localhost:8081/realms/badrlink}
       jwk-set-uri: ${JWT_JWK_SET_URI:http://localhost:8081/oauth2/jwks}
     internal:
-      hmac-secret: ${INTERNAL_HMAC_SECRET:dev-internal-secret-change-me}
+      hmac-secret: ${INTERNAL_HMAC_SECRET}
     auth-service:
       base-url: ${AUTH_SERVICE_URL:http://localhost:8081}

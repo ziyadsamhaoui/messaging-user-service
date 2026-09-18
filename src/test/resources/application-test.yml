@@ -1,0 +1,13 @@
+spring:
+  docker:
+    compose:
+      enabled: false
+badrlink:
+  security:
+    jwt:
+      jwk-set-uri: ""
+      hmac-secret: "test-hmac-secret-0123456789abcdef"
+    internal:
+      hmac-secret: "test-internal-secret"
+    auth-service:
+      base-url: "http://localhost:8081"

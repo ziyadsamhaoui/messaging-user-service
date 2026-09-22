@@ -27,7 +27,7 @@ CREATE TABLE connections (
     user_id_1      UUID NOT NULL,
     user_id_2      UUID NOT NULL,
     status         VARCHAR(20) NOT NULL,
-    connection_hash CHAR(64) NOT NULL,
+    connection_hash VARCHAR(64) NOT NULL,
     created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
 
     CONSTRAINT connections_no_self_connect CHECK (user_id_1 <> user_id_2),

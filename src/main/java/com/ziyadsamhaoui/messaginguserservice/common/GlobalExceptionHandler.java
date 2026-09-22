@@ -13,6 +13,7 @@ import com.ziyadsamhaoui.messaginguserservice.exception.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -56,6 +57,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({ForbiddenOperationException.class, ForbiddenConnectionOperationException.class})
     ResponseEntity<Map<String, Object>> handleForbidden(Exception ex) {
         return build(HttpStatus.FORBIDDEN, ex.getMessage());
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    ResponseEntity<Map<String, Object>> handleAuthorizationDenied(AuthorizationDeniedException ex) {
+        return build(HttpStatus.FORBIDDEN, "access denied");
     }
 
     @ExceptionHandler(RoleSyncException.class)

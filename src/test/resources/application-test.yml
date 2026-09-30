@@ -3,6 +3,8 @@ spring:
     compose:
       enabled: false
 badrlink:
+  kafka:
+    enabled: false
   security:
     jwt:
       jwk-set-uri: ""

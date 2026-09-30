@@ -20,7 +20,7 @@ target/
 *.ipr
 *.junie
 /docs/
-/adr/
+/docs/adr/
 
 ### NetBeans ###
 /nbproject/private/
@@ -35,4 +35,5 @@ build/
 ### VS Code ###
 .vscode/
 logs
+/
 

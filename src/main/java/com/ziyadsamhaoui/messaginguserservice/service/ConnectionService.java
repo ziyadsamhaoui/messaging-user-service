@@ -6,12 +6,15 @@ import com.ziyadsamhaoui.messaginguserservice.enums.ConnectionStatus;
 import com.ziyadsamhaoui.messaginguserservice.exception.*;
 import com.ziyadsamhaoui.messaginguserservice.repository.ConnectionRepository;
 import com.ziyadsamhaoui.messaginguserservice.common.ConnectionHasher;
+import com.ziyadsamhaoui.messaginguserservice.outbox.TransactionalOutboxPublisher;
+import com.ziyadsamhaoui.messaginguserservice.outbox.UserEvents;
 import com.ziyadsamhaoui.messaginguserservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,6 +24,7 @@ public class ConnectionService {
 
     private final ConnectionRepository connectionRepository;
     private final UserRepository userRepository;
+    private final TransactionalOutboxPublisher outboxPublisher;
 
     @Transactional
     public ConnectionDto request(UUID requesterId, UUID addresseeId) {
@@ -61,6 +65,11 @@ public class ConnectionService {
             throw new InvalidConnectionStateException("connection is not pending");
         }
         connection.accept();
+        // Sprint 6 §2.2: same transaction as the accept transition. Feeds a future
+        // Notification service; no consumer required this sprint.
+        outboxPublisher.publish(TransactionalOutboxPublisher.AGGREGATE_TYPE, connection.getId().toString(),
+                UserEvents.USER_CONNECTION_ACCEPTED, new UserEvents.UserConnectionAccepted(
+                        connection.getUserId1(), connection.getUserId2(), Instant.now()));
         return toDto(connection, actingUserId);
     }
 

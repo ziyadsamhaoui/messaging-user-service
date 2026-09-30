@@ -2,6 +2,8 @@ package com.ziyadsamhaoui.messaginguserservice.service;
 
 import com.ziyadsamhaoui.messaginguserservice.model.Block;
 import com.ziyadsamhaoui.messaginguserservice.model.BlockId;
+import com.ziyadsamhaoui.messaginguserservice.outbox.TransactionalOutboxPublisher;
+import com.ziyadsamhaoui.messaginguserservice.outbox.UserEvents;
 import com.ziyadsamhaoui.messaginguserservice.repository.BlockRepository;
 import com.ziyadsamhaoui.messaginguserservice.exception.SelfBlockedException;
 import com.ziyadsamhaoui.messaginguserservice.exception.UserNotFoundException;
@@ -10,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,6 +22,7 @@ public class BlockService {
 
     private final BlockRepository blockRepository;
     private final UserRepository userRepository;
+    private final TransactionalOutboxPublisher outboxPublisher;
 
     @Transactional
     public void block(UUID blockerId, UUID blockedId) {
@@ -32,11 +36,20 @@ public class BlockService {
             return;
         }
         blockRepository.save(new Block(new BlockId(blockerId, blockedId), null));
+        // Sprint 6 §2.2: same transaction as the block insert; consumed by Chat's block cache.
+        outboxPublisher.publish(TransactionalOutboxPublisher.AGGREGATE_TYPE, blockerId.toString(),
+                UserEvents.USER_BLOCKED, new UserEvents.UserBlocked(blockerId, blockedId, Instant.now()));
     }
 
     @Transactional
     public void unblock(UUID blockerId, UUID blockedId) {
-        blockRepository.deleteByBlockerIdAndBlockedId(blockerId, blockedId);
+        long deleted = blockRepository.deleteByBlockerIdAndBlockedId(blockerId, blockedId);
+        // Only emit when a row actually went away: unblocking a non-existent block
+        // must not produce an event.
+        if (deleted > 0) {
+            outboxPublisher.publish(TransactionalOutboxPublisher.AGGREGATE_TYPE, blockerId.toString(),
+                    UserEvents.USER_UNBLOCKED, new UserEvents.UserUnblocked(blockerId, blockedId));
+        }
     }
 
     @Transactional(readOnly = true)

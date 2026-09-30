@@ -6,6 +6,8 @@ import com.ziyadsamhaoui.messaginguserservice.exception.DuplicateUsernameExcepti
 import com.ziyadsamhaoui.messaginguserservice.exception.ForbiddenOperationException;
 import com.ziyadsamhaoui.messaginguserservice.exception.RoleSyncException;
 import com.ziyadsamhaoui.messaginguserservice.exception.UserNotFoundException;
+import com.ziyadsamhaoui.messaginguserservice.outbox.TransactionalOutboxPublisher;
+import com.ziyadsamhaoui.messaginguserservice.outbox.UserEvents;
 import com.ziyadsamhaoui.messaginguserservice.repository.UserRepository;
 import com.ziyadsamhaoui.messaginguserservice.security.AuthClient;
 import com.ziyadsamhaoui.messaginguserservice.dto.UserDtos.CreateUserRequest;
@@ -26,6 +28,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final AuthClient authClient;
+    private final TransactionalOutboxPublisher outboxPublisher;
 
     @Transactional
     public PublicUserDto createInternalUser(CreateUserRequest request) {
@@ -38,7 +41,13 @@ public class UserService {
                 .type(UserType.USER)
                 .build();
         try {
-            return toPublicDto(userRepository.saveAndFlush(user));
+            PublicUserDto dto = toPublicDto(userRepository.saveAndFlush(user));
+            // Sprint 6 §2.2: same transaction as the insert, whatever the trigger —
+            // the sync REST call or the CREDENTIAL_REGISTERED consumer (dual path).
+            outboxPublisher.publish(TransactionalOutboxPublisher.AGGREGATE_TYPE, request.id().toString(),
+                    UserEvents.USER_PROFILE_CREATED, new UserEvents.UserProfileCreated(
+                            request.id(), request.username(), dto.createdAt()));
+            return dto;
         } catch (DataIntegrityViolationException ex) {
             throw new DuplicateUsernameException(request.username());
         }
@@ -72,9 +81,19 @@ public class UserService {
                     throw new DuplicateUsernameException(request.username());
                 });
         User user = getUserOrThrow(targetId);
+        boolean usernameChanged = !user.getUsername().equalsIgnoreCase(request.username());
         user.applyProfileUpdate(request.username(), request.profilePictureUrl(), request.description());
         try {
-            return toPublicDto(userRepository.saveAndFlush(user));
+            PublicUserDto dto = toPublicDto(userRepository.saveAndFlush(user));
+            if (usernameChanged) {
+                // Sprint 6 §2.2: User is authoritative for renames (flagged ambiguity in the
+                // guide resolved against the actual PATCH /users/{id} handler, which accepts
+                // username; Auth has no rename endpoint).
+                outboxPublisher.publish(TransactionalOutboxPublisher.AGGREGATE_TYPE, targetId.toString(),
+                        UserEvents.USER_USERNAME_CHANGED, new UserEvents.UserUsernameChanged(
+                                targetId, request.username(), Instant.now()));
+            }
+            return dto;
         } catch (DataIntegrityViolationException ex) {
             throw new DuplicateUsernameException(request.username());
         }
@@ -94,6 +113,13 @@ public class UserService {
             user.promoteTo(previous);
             throw new RoleSyncException(targetId);
         }
+        // Sprint 6 §2.2: additive to the synchronous PATCH /internal/credentials/{id}/role
+        // call — that sync path (rollback-on-failure, 502) stays; this event is for later
+        // Admin/audit consumers. Appended after the sync call succeeded so the rollback
+        // path never leaves an orphan event behind.
+        outboxPublisher.publish(TransactionalOutboxPublisher.AGGREGATE_TYPE, targetId.toString(),
+                UserEvents.USER_ROLE_CHANGED, new UserEvents.UserRoleChanged(
+                        targetId, newType.name(), Instant.now()));
         return toPublicDto(user);
     }
 

@@ -11,11 +11,7 @@ import java.util.UUID;
 
 public interface OutboxEventRepository extends JpaRepository<OutboxEvent, UUID> {
 
-    /**
-     * Sprint 6 §3.3 — oldest-first batch of unpublished rows.
-     * {@code SKIP LOCKED} keeps two relay instances from grabbing the same rows
-     * if this service ever runs more than one replica.
-     */
+
     @Query(value = """
             select * from outbox_events
             where published_at is null
@@ -25,7 +21,6 @@ public interface OutboxEventRepository extends JpaRepository<OutboxEvent, UUID> 
             """, nativeQuery = true)
     List<OutboxEvent> lockUnpublishedBatch(@Param("batch") int batch);
 
-    /** Separate from the publish call — the gap between them is what makes redelivery (and consumer idempotency) mandatory. */
     @Modifying
     @Query("update OutboxEvent o set o.publishedAt = :publishedAt where o.id in :ids")
     int markPublished(@Param("ids") List<UUID> ids, @Param("publishedAt") Instant publishedAt);

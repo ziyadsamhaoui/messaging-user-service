@@ -31,6 +31,7 @@ public final class UserEvents {
     public record UserUnblocked(UUID blockerId, UUID blockedId) {
     }
 
-    public record UserConnectionAccepted(UUID userIdA, UUID userIdB, Instant acceptedAt) {
+    public record UserConnectionAccepted(UUID userIdA, UUID userIdB, String userAUsername, String userBUsername,
+            Instant acceptedAt) {
     }
 }

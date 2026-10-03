@@ -31,8 +31,7 @@ badrlink:
       topic: badrlink.user.profile.v1
   security:
     jwt:
-      issuer-uri: ${JWT_ISSUER_URI:http://localhost:8081/realms/badrlink}
-      jwk-set-uri: ${JWT_JWK_SET_URI:http://localhost:8081/oauth2/jwks}
+      jwk-set-uri: ${JWT_JWK_SET_URI:http://messaging-auth-service:8081/oauth2/jwks}
       hmac-secret: ${JWT_HMAC_SECRET:}
     internal:
       hmac-secret: ${INTERNAL_HMAC_SECRET}

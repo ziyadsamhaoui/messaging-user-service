@@ -69,7 +69,8 @@ public class ConnectionService {
         // Notification service; no consumer required this sprint.
         outboxPublisher.publish(TransactionalOutboxPublisher.AGGREGATE_TYPE, connection.getId().toString(),
                 UserEvents.USER_CONNECTION_ACCEPTED, new UserEvents.UserConnectionAccepted(
-                        connection.getUserId1(), connection.getUserId2(), Instant.now()));
+                        connection.getUserId1(), connection.getUserId2(),
+                        usernameOf(connection.getUserId1()), usernameOf(connection.getUserId2()), Instant.now()));
         return toDto(connection, actingUserId);
     }
 
@@ -98,6 +99,10 @@ public class ConnectionService {
         return connectionRepository.findPendingInvolving(userId).stream()
                 .map(connection -> toDto(connection, userId))
                 .toList();
+    }
+
+    private String usernameOf(UUID userId) {
+        return userRepository.findById(userId).map(user -> user.getUsername()).orElse(null);
     }
 
     private Connection getConnectionOrThrow(Long connectionId) {

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,6 +31,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final InternalAuthFilter internalAuthFilter;
+    private final Environment environment;
 
     @Value("${badrlink.security.jwt.jwk-set-uri:}")
     private String jwkSetUri;
@@ -55,14 +57,23 @@ public class SecurityConfig {
 
     @Bean
     JwtDecoder jwtDecoder() {
-        if (hmacSecret != null && !hmacSecret.isBlank()) {
-            SecretKey key = new SecretKeySpec(hmacSecret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
-            return NimbusJwtDecoder.withSecretKey(key).build();
-        }
         if (jwkSetUri != null && !jwkSetUri.isBlank()) {
             return NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
         }
+        if (hmacSecret != null && !hmacSecret.isBlank() && hmacFallbackAllowed()) {
+            SecretKey key = new SecretKeySpec(hmacSecret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+            return NimbusJwtDecoder.withSecretKey(key).build();
+        }
         throw new IllegalStateException("no JWT verification method configured");
+    }
+
+    private boolean hmacFallbackAllowed() {
+        for (String profile : environment.getActiveProfiles()) {
+            if ("dev".equals(profile) || "test".equals(profile)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter() {

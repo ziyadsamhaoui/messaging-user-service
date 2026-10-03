@@ -182,8 +182,8 @@ Full template: `.env.example`.
 | Variable | Default | Notes |
 | -------- | ------- | ----- |
 | `DB_HOST/DB_PORT/DB_NAME/DB_USER/DB_PASSWORD` | localhost/5433/user_db/user_service | PostgreSQL |
-| `JWT_JWK_SET_URI` | `http://localhost:8081/oauth2/jwks` | JWKS verification (no endpoint ships yet — INC-02) |
-| `JWT_HMAC_SECRET` | empty | HS256 mode for local/dev; when set it takes precedence — **shared** with Auth |
+| `JWT_JWK_SET_URI` | `http://messaging-auth-service:8081/oauth2/jwks` | Primary RS256 verification against Auth's JWKS |
+| `JWT_HMAC_SECRET` | empty | HS256 fallback, used **only** under the `dev`/`test` profiles when `JWT_JWK_SET_URI` is empty |
 | `INTERNAL_HMAC_SECRET` | — | inbound internal token; **shared** with Auth and Realtime Gateway |
 | `AUTH_SERVICE_URL` | `http://localhost:8081` | outbound role sync |
 | `KAFKA_BOOTSTRAP_SERVERS / KAFKA_ENABLED` | localhost:9092 / true | event backbone |
@@ -193,7 +193,7 @@ Full template: `.env.example`.
 
 ## Events (Sprint 6)
 
-Published to `badrlink.user.profile.v1`: `USER_PROFILE_CREATED`, `USER_USERNAME_CHANGED`, `USER_ROLE_CHANGED`, `USER_BLOCKED`, `USER_UNBLOCKED`, `USER_CONNECTION_ACCEPTED`. Consumed from `badrlink.auth.credential.v1`: `CREDENTIAL_REGISTERED` (dual-path registration; calls the same idempotent method as `POST /internal/users`). Catalog: `docs/EVENTS.md`; decision record: [`/docs/adr/0007`](../docs/adr/0007-user-profile-events-dual-path.md).
+Published to `badrlink.user.profile.v1`: `USER_PROFILE_CREATED`, `USER_USERNAME_CHANGED`, `USER_ROLE_CHANGED`, `USER_BLOCKED`, `USER_UNBLOCKED`, `USER_CONNECTION_ACCEPTED`. Sprint 7 added `userAUsername`/`userBUsername` to `USER_CONNECTION_ACCEPTED` additively for the Notification service. Consumed from `badrlink.auth.credential.v1`: `CREDENTIAL_REGISTERED` (dual-path registration; calls the same idempotent method as `POST /internal/users`). Catalog: `docs/EVENTS.md`; decision record: [`/docs/adr/0007`](../docs/adr/0007-user-profile-events-dual-path.md).
 
 ---
 
